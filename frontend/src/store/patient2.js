@@ -1,9 +1,9 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'; 
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 const patientAPI = createApi({
-    reducerPath: 'patientAPI', 
-    baseQuery: fetchBaseQuery({ 
-        baseUrl: 'http://127.0.0.1:8000/api',
+    reducerPath: 'patientAPI',
+    baseQuery: fetchBaseQuery({
+        baseUrl: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api',
         prepareHeaders: (headers, { getState }) => {
             const token = getState().auth?.token; // Tokeni Redux state'ten al
             if (token) {
@@ -33,7 +33,7 @@ const patientAPI = createApi({
         // --------- PATİENTS -------------
 
         getPatients: builder.query({
-            query: ({ page = 1 , filters, orderValue }) => ({
+            query: ({ page = 1, filters, orderValue }) => ({
                 url: 'patientcard/',
                 params: {
                     page,
@@ -47,11 +47,11 @@ const patientAPI = createApi({
             },
         }),
         getPatientId: builder.query({
-             query: (selectedPatientId) => `patientcard/${selectedPatientId}`,
-             providesTags: (result, error, id) => [{ type: 'Patient', id }],
+            query: (selectedPatientId) => `patientcard/${selectedPatientId}`,
+            providesTags: (result, error, id) => [{ type: 'Patient', id }],
         }),
         createPatient: builder.mutation({
-            query: ({newPatient}) => ({
+            query: ({ newPatient }) => ({
                 url: 'patientcard/',
                 method: 'POST',
                 body: newPatient
@@ -62,19 +62,19 @@ const patientAPI = createApi({
             query: ({ page = 1 }) => `patient-files/?page=${page}`,
             providesTags: (result) => {
                 if (!result || !result.data) {
-                  return [{ type: 'PatientFile', id: 'LIST' }];
+                    return [{ type: 'PatientFile', id: 'LIST' }];
                 }
                 return result.data.map(({ id }) => ({ type: 'PatientFile', id }));
-              },
+            },
         }),
         getFileSize: builder.query({
             query: (fileUrl) => ({
-              url: fileUrl,
-              method: 'HEAD',
+                url: fileUrl,
+                method: 'HEAD',
             }),
             transformResponse: (response, meta) => {
-              const size = meta.response.headers.get("content-length"); // Byte cinsinden boyut
-              return size ? (size / 1024).toFixed(1) : null; // KB'ye çevir
+                const size = meta.response.headers.get("content-length"); // Byte cinsinden boyut
+                return size ? (size / 1024).toFixed(1) : null; // KB'ye çevir
             },
         }),
         createPatientFile: builder.mutation({
@@ -111,32 +111,32 @@ const patientAPI = createApi({
             }
         }),
         createPtientPhoto: builder.mutation({
-            query: (newPhoto)=> ({
+            query: (newPhoto) => ({
                 url: "patient-photo/",
                 method: "POST",
                 body: newPhoto
             })
         }),
         createPatientPoll: builder.mutation({
-            query: ({newPoll, patientID}) => ({
+            query: ({ newPoll, patientID }) => ({
                 url: "poll/",
                 method: "POST",
                 body: newPoll
             }),
-            providesTags: ({patientID}) => [{ type: 'Patient', id: patientID }],
+            providesTags: ({ patientID }) => [{ type: 'Patient', id: patientID }],
         }),
 
         // --------- Doctor Note -------------
 
         createDoctorNote: builder.mutation({
-            query: (newNote)=> ({
+            query: (newNote) => ({
                 url: "patientnote/",
                 method: "POST",
                 body: newNote
             })
         }),
         updateDoctorNote: builder.mutation({
-            query: ({newNote, noteID})=> ({
+            query: ({ newNote, noteID }) => ({
                 url: `patientnote/${noteID}/`,
                 method: "PATCH",
                 body: newNote
@@ -144,12 +144,12 @@ const patientAPI = createApi({
             invalidatesTags: ({ patientId }) => {
                 return [{ type: 'Patient', id: patientId }]
             },
-        }),        
- 
+        }),
+
         // --------- STOCK ORDER -------------
-        
+
         getStockOrders: builder.query({
-            query: ({page = 1, filters, orderValue}) => ({
+            query: ({ page = 1, filters, orderValue }) => ({
                 url: 'order/',
                 params: {
                     page,
@@ -159,13 +159,13 @@ const patientAPI = createApi({
             }),
             providesTags: (result) => {
                 if (!result || !result.data) {
-                  return [{ type: 'Order', id: 'LIST' }];
+                    return [{ type: 'Order', id: 'LIST' }];
                 }
                 return result.data.map(({ id }) => ({ type: 'Order', id }));
-              },
+            },
         }),
         getStockOrdersByID: builder.query({
-            query: (ID) =>`order/${ID}/`,
+            query: (ID) => `order/${ID}/`,
             providesTags: (result, error, id) => [{ type: 'Order', id }],
         }),
         createStockOrder: builder.mutation({
@@ -184,29 +184,29 @@ const patientAPI = createApi({
             }),
             invalidatesTags: [{ type: 'Order', id: 'LIST' }],
         }),
-        
+
         // --------- STOCK -------------
-        
+
         getAllStocks: builder.query({
-            query: ({ page = 1, stock_warehouse="", type, filters="", orderValue="" } = {}) => {
-                const params = new URLSearchParams({ page, default_filter: filters, ordering: orderValue })    
+            query: ({ page = 1, stock_warehouse = "", type, filters = "", orderValue = "" } = {}) => {
+                const params = new URLSearchParams({ page, default_filter: filters, ordering: orderValue })
                 switch (type) {
                     case "total":
                         return {
                             url: 'stock-total-summary/',
                             params: params.toString()
-                        }     
+                        }
                     case "warehouse":
                         params.append("stock_warehouse", stock_warehouse);
                         return {
                             url: 'stock-warehouse-summary/',
                             params: params.toString()
-                        }        
+                        }
                     case "skt":
                         return {
                             url: 'stock-summary/',
                             params: params.toString()
-                        }        
+                        }
                     default:
                         params.append("stock_warehouse", stock_warehouse);
                         return {
@@ -224,20 +224,20 @@ const patientAPI = createApi({
             })
         }),
         updateStock: builder.mutation({
-            query: ({newStock, stockID}) => ({
+            query: ({ newStock, stockID }) => ({
                 url: `stock/${stockID}/`,
                 method: 'PATCH',
                 body: newStock
             })
-        }),  
+        }),
         createStockUse: builder.mutation({
-            query: ({newStock}) => ({
+            query: ({ newStock }) => ({
                 url: `used-stock/`,
                 method: 'POST',
                 body: newStock
             }),
-            invalidatesTags: (result, error, id) =>  result ? [{ type: 'Patient', id: result.patient_used }] : [],
-        }),   
+            invalidatesTags: (result, error, id) => result ? [{ type: 'Patient', id: result.patient_used }] : [],
+        }),
 
         // --------- WAREHOUSE -------------
 
@@ -257,11 +257,11 @@ const patientAPI = createApi({
                 },
             }),
             providesTags: () => [{ type: 'Worker', id: 'LIST' }],
-        }),        
+        }),
         getWorkerById: builder.query({
-            query: ( workerID ) => `worker/${workerID}/`,
+            query: (workerID) => `worker/${workerID}/`,
             providesTags: (result, error, id) => [{ type: 'Worker', id }],
-        }),  
+        }),
         getAllWorkerLeaves: builder.query({
             query: ({ page = 1, filters, orderValue }) => ({
                 url: 'leave/',
@@ -272,7 +272,7 @@ const patientAPI = createApi({
                 },
             }),
             providesTags: () => [{ type: 'Leave', id: 'LIST' }],
-        }),      
+        }),
         createWorker: builder.mutation({
             query: (newWorker) => ({
                 url: 'worker/',
@@ -282,12 +282,12 @@ const patientAPI = createApi({
             invalidatesTags: [{ type: 'Worker', id: 'LIST' }],
         }),
         updateWorker: builder.mutation({
-            query: ({newWorker, workerID}) => ({
+            query: ({ newWorker, workerID }) => ({
                 url: `worker/${workerID}/`,
                 method: 'PATCH',
                 body: newWorker
             }),
-            invalidatesTags: ({workerID}) => [{ type: 'Worker', id: workerID }],
+            invalidatesTags: ({ workerID }) => [{ type: 'Worker', id: workerID }],
         }),
         createWorkerFile: builder.mutation({
             query: (files) => ({
@@ -313,7 +313,7 @@ const patientAPI = createApi({
             invalidatesTags: [{ type: 'Worker', id: 'LIST' }],
         }),
         createWorkerTask: builder.mutation({
-            query: (newTask)=> ({
+            query: (newTask) => ({
                 url: "task-assignment/",
                 method: "POST",
                 body: newTask
@@ -330,49 +330,49 @@ const patientAPI = createApi({
                 method: "POST",
                 body: newCheck
             }),
-            invalidatesTags: (result, error) => {                
+            invalidatesTags: (result, error) => {
                 return [{ type: 'Worker', id: result.person }]
             }
         }),
 
-    }),      
+    }),
     keepUnusedDataFor: 30,
     refetchOnMountOrArgChange: 5
 });
 
-export const {  useGetPatientsQuery, 
-                useGetPatientIdQuery,
-                useCreatePatientMutation,
-                useUpdatePatientMutation,
-                useDeletePatientMutation,
-                useGetStockOrdersQuery,
-                useGetStockOrdersByIDQuery,
-                useCreateStockOrderMutation,
-                useGetAllStocksQuery,
-                useCreateStockMutation,
-                useCreateWorkerMutation,
-                useGetAllWorkerQuery,
-                useGetWorkerByIdQuery,
-                useCreateWorkerFileMutation,
-                useCreateWorkerLeavesMutation,
-                useCreateWorkerHoursMutation,
-                useCreateWorkerTaskMutation,
-                useCreateDoctorNoteMutation,
-                useCreatePtientPhotoMutation,
-                useGetWarehouseQuery,
-                useUpdateStockOrderMutation,
-                useCreatePatientFileMutation,
-                useGetPatientFileQuery,
-                useGetFileSizeQuery,
-                useCreateTaskCheckMutation,
-                useUpdateStockMutation,
-                useGetAllWorkerLeavesQuery,
-                useCreateStockUseMutation,
-                useLoginMutation,
-                useRefreshTokenMutation,
-                useUpdateDoctorNoteMutation,
-                useUpdateWorkerMutation,
-                useCreatePatientPollMutation
-                
-           } = patientAPI; 
+export const { useGetPatientsQuery,
+    useGetPatientIdQuery,
+    useCreatePatientMutation,
+    useUpdatePatientMutation,
+    useDeletePatientMutation,
+    useGetStockOrdersQuery,
+    useGetStockOrdersByIDQuery,
+    useCreateStockOrderMutation,
+    useGetAllStocksQuery,
+    useCreateStockMutation,
+    useCreateWorkerMutation,
+    useGetAllWorkerQuery,
+    useGetWorkerByIdQuery,
+    useCreateWorkerFileMutation,
+    useCreateWorkerLeavesMutation,
+    useCreateWorkerHoursMutation,
+    useCreateWorkerTaskMutation,
+    useCreateDoctorNoteMutation,
+    useCreatePtientPhotoMutation,
+    useGetWarehouseQuery,
+    useUpdateStockOrderMutation,
+    useCreatePatientFileMutation,
+    useGetPatientFileQuery,
+    useGetFileSizeQuery,
+    useCreateTaskCheckMutation,
+    useUpdateStockMutation,
+    useGetAllWorkerLeavesQuery,
+    useCreateStockUseMutation,
+    useLoginMutation,
+    useRefreshTokenMutation,
+    useUpdateDoctorNoteMutation,
+    useUpdateWorkerMutation,
+    useCreatePatientPollMutation
+
+} = patientAPI;
 export default patientAPI;
