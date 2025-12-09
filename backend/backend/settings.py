@@ -60,6 +60,7 @@ CHANNEL_LAYERS = {
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -162,4 +163,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-ALLOWED_HOSTS = ['54.167.202.76', '127.0.0.1','*','18.184.25.11','18.184.25.11:5173','18.184.25.11:5174','18.184.25.11:5175']
+ALLOWED_HOSTS = ['54.167.202.76', '127.0.0.1','*','18.184.25.11','18.184.25.11:5173','18.184.25.11:5174','18.184.25.11:5175', '.vercel.app']
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
