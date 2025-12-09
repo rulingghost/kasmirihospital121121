@@ -40,11 +40,12 @@ import ENabiz from './pages/ENabiz'
 import Reports from './pages/Reports'
 import SettingsPage from './pages/SettingsPage'
 import Deneme from './UI/Deneme'
-import Anket from './pages/Anket'
 import Bodro from './pages/Bodro'
 import PatientEpikriz from './pages/patient/patientDetail/PatientEpikriz'
 import PatientPhotos from './pages/patient/patientDetail/PatientPhotos'
 import LoginPage from './pages/LoginPage'
+import PatientPoll from './pages/patient/patientDetail/PatientPoll'
+import BillingDetail from './pages/billing/BillingDetail'
 
 function App() {  
 
@@ -70,7 +71,7 @@ function App() {
                 { path: "files", element: <PatientFiles /> },
                 { path: "bill", element: <PatientBill /> },
                 { path: "photos", element: <PatientPhotos /> },
-                { path: "poll", element: <Anket />},
+                { path: "poll", element: <PatientPoll />},
                 { index: true, element: <Navigate to="overview" replace /> }
               ]
             },
@@ -115,6 +116,7 @@ function App() {
           ]
         },
         { path: "billing", element: <Billing />},
+        { path: "billing/:billNo", element: <BillingDetail />},
         { path: "e-nabiz", element: <ENabiz />},
         { path: "reporting", element: <Reports />},
         { path: "settings", element: <SettingsPage />},
